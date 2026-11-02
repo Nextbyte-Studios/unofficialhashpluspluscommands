@@ -1,6 +1,9 @@
 # unofficialhashpluspluscommands
 Hi! Here you will find community commands that we personally added here for the command-line version of HashPlusPlus
 
+Build a command kit
+
+
 ### How do I make a command?
 Here's a one argument example:
 ```json
