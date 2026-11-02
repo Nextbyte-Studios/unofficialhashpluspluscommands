@@ -1,0 +1,11 @@
+{
+    "name": "Greeting",
+    "triggercommand": "greet",
+    "description": "Greets someone by name.",
+    "usage": "greet <person>",
+    "args": 1,
+    "arguments": {
+        "arg1": "person"
+    },
+    "script": "print(f'Hello, {person}!')"
+}
