@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashPlusPlus Build-a-command kit</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 20px;
+            background: #111114;
+            color: #eeeeee;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 30px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        p {
+            color: #aaaab2;
+        }
+
+        header {
+            margin-bottom: 28px;
+        }
+
+        header p {
+            margin-top: 0;
+        }
+
+        .purple {
+            color: #b99cff;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section {
+            min-width: 0;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 6px;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #38383f;
+            border-radius: 5px;
+            background: #1b1b20;
+            color: #eeeeee;
+            font: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #b99cff;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .help {
+            margin: 5px 0 0;
+            font-size: 12px;
+        }
+
+        #argumentFields {
+            margin-top: 8px;
+        }
+
+        .argument {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        .argument span {
+            width: 45px;
+            color: #aaaab2;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .argument input {
+            flex: 1;
+        }
+
+        #status {
+            margin: 0 0 10px;
+            font-size: 13px;
+        }
+
+        #status.good {
+            color: #83d6a5;
+        }
+
+        #status.bad {
+            color: #ff8585;
+        }
+
+        #messages {
+            padding-left: 19px;
+            font-size: 13px;
+        }
+
+        #messages li {
+            margin: 5px 0;
+        }
+
+        #messages .error {
+            color: #ff8585;
+        }
+
+        #messages .warning {
+            color: #eacb79;
+        }
+
+        pre {
+            min-height: 300px;
+            max-height: 500px;
+            overflow: auto;
+            padding: 14px;
+            border: 1px solid #38383f;
+            border-radius: 5px;
+            background: #19191e;
+            color: #ded8ef;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font: 13px/1.6 Consolas, monospace;
+        }
+
+        button {
+            margin: 10px 6px 0 0;
+            padding: 9px 13px;
+            border: 1px solid #45454d;
+            border-radius: 5px;
+            background: #24242b;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        button:hover {
+            border-color: #b99cff;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        button.main-button {
+            border-color: #b99cff;
+            background: #b99cff;
+            color: #17121f;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 22px 15px;
+            }
+
+            .columns {
+                grid-template-columns: 1fr;
+                gap: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1><span class="purple">HashPlusPlus</span> Build-a-command kit</h1>
+            <p>Make your own command and turn it into a JSON file.</p>
+        </header>
+
+        <div class="columns">
+            <section class="section">
+                <h2>Command information</h2>
+
+                <label for="name">Name</label>
+                <input id="name" type="text" placeholder="Greeting">
+
+                <label for="trigger">Trigger command</label>
+                <input id="trigger" type="text" placeholder="greet">
+                <p class="help">The command people type to run it.</p>
+
+                <label for="description">Description</label>
+                <input id="description" type="text" placeholder="Greets someone by name.">
+
+                <label for="usage">Usage</label>
+                <input id="usage" type="text" placeholder="greet &lt;person&gt;">
+
+                <label for="args">Number of arguments</label>
+                <input id="args" type="number" min="0" max="20" value="1">
+
+                <label>Argument names</label>
+                <div id="argumentFields"></div>
+                <p class="help">These are the variable names you use in your Python script.</p>
+
+                <label for="script">Python script</label>
+                <textarea id="script" spellcheck="false" placeholder="print(f'Hello, {person}!')"></textarea>
+            </section>
+
+            <section class="section">
+                <h2>Command JSON</h2>
+                <p id="status">Fill in the details to get started.</p>
+                <ul id="messages"></ul>
+                <pre id="output">{ }</pre>
+
+                <button class="main-button" id="download" disabled>Download JSON</button>
+                <button id="copy" disabled>Copy JSON</button>
+                <button id="example">Load example</button>
+                <button id="clear">Clear</button>
+                <p class="help">This checks the command details and common mistakes. It won't run your Python script.</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const nameInput = document.getElementById("name");
+        const triggerInput = document.getElementById("trigger");
+        const descriptionInput = document.getElementById("description");
+        const usageInput = document.getElementById("usage");
+        const argsInput = document.getElementById("args");
+        const scriptInput = document.getElementById("script");
+        const argumentFields = document.getElementById("argumentFields");
+        const output = document.getElementById("output");
+        const status = document.getElementById("status");
+        const messages = document.getElementById("messages");
+        const downloadButton = document.getElementById("download");
+        const copyButton = document.getElementById("copy");
+
+        let commandJSON = null;
+
+        // Add one input for each command argument.
+        function updateArguments() {
+            const amount = Number(argsInput.value);
+            const oldNames = [];
+
+            argumentFields.querySelectorAll("input").forEach(input => {
+                oldNames.push(input.value);
+            });
+
+            argumentFields.innerHTML = "";
+
+            for (let i = 1; i <= amount && i <= 20; i++) {
+                const row = document.createElement("div");
+                row.className = "argument";
+
+                const number = document.createElement("span");
+                number.textContent = "arg" + i;
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = i === 1 ? "person" : "argument" + i;
+                input.value = oldNames[i - 1] || "";
+                input.dataset.number = i;
+                input.addEventListener("input", checkCommand);
+
+                row.appendChild(number);
+                row.appendChild(input);
+                argumentFields.appendChild(row);
+            }
+        }
+
+        function checkCommand() {
+            const errors = [];
+            const warnings = [];
+            const argumentInputs = argumentFields.querySelectorAll("input");
+            const argumentNames = [];
+            const reservedWords = [
+                "and", "as", "assert", "async", "await", "break", "class", "continue",
+                "def", "del", "elif", "else", "except", "False", "finally", "for",
+                "from", "global", "if", "import", "in", "is", "lambda", "None",
+                "nonlocal", "not", "or", "pass", "raise", "return", "True", "try",
+                "while", "with", "yield"
+            ];
+
+            const name = nameInput.value.trim();
+            const trigger = triggerInput.value.trim();
+            const description = descriptionInput.value.trim();
+            const usage = usageInput.value.trim();
+            const script = scriptInput.value;
+            const amount = Number(argsInput.value);
+
+            if (!name) errors.push("Enter a name for your command.");
+            if (!trigger) {
+                errors.push("Enter a trigger command.");
+            } else if (!/^[a-zA-Z0-9_-]+$/.test(trigger)) {
+                errors.push("The trigger can only contain letters, numbers, _ and -.");
+            }
+            if (!description) errors.push("Add a description.");
+            if (!usage) errors.push("Add the command usage.");
+            if (argsInput.value === "" || !Number.isInteger(amount) || amount < 0 || amount > 20) {
+                errors.push("The number of arguments must be between 0 and 20.");
+            }
+            if (!script.trim()) errors.push("Add a Python script.");
+
+            argumentInputs.forEach((input, index) => {
+                const argument = input.value.trim();
+                argumentNames.push(argument);
+
+                if (!argument) {
+                    errors.push("Enter a name for arg" + (index + 1) + ".");
+                } else if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(argument)) {
+                    errors.push(argument + " is not a valid Python variable name.");
+                } else if (reservedWords.includes(argument)) {
+                    errors.push(argument + " is a Python reserved word.");
+                } else if (argumentNames.indexOf(argument) !== index) {
+                    errors.push(argument + " has been used more than once.");
+                }
+            });
+
+            if (usage && trigger && !usage.startsWith(trigger)) {
+                warnings.push("Your usage normally starts with the trigger command.");
+            }
+
+            const usageArguments = usage.match(/<[^<>]+>/g) || [];
+            if (Number.isInteger(amount) && usageArguments.length !== amount) {
+                warnings.push("Your usage has " + usageArguments.length + " argument placeholder(s), but the argument count is " + amount + ".");
+            }
+
+            if (script && argumentNames.length) {
+                argumentNames.forEach(argument => {
+                    if (argument && !script.includes(argument)) {
+                        warnings.push("Your script doesn't seem to use " + argument + ".");
+                    }
+                });
+            }
+
+            const commandArguments = {};
+            argumentNames.forEach((argument, index) => {
+                commandArguments["arg" + (index + 1)] = argument;
+            });
+
+            const command = {
+                name: name,
+                triggercommand: trigger,
+                description: description,
+                usage: usage,
+                args: amount,
+                arguments: commandArguments,
+                script: script
+            };
+
+            output.textContent = JSON.stringify(command, null, 4);
+            commandJSON = errors.length === 0 ? command : null;
+
+            messages.innerHTML = "";
+            errors.forEach(message => addMessage(message, "error"));
+            warnings.forEach(message => addMessage(message, "warning"));
+
+            if (errors.length > 0) {
+                status.textContent = errors.length + " error(s) to fix.";
+                status.className = "bad";
+            } else if (warnings.length > 0) {
+                status.textContent = "No errors, but check these warnings.";
+                status.className = "";
+            } else {
+                status.textContent = "Everything looks good. Your JSON is ready.";
+                status.className = "good";
+            }
+
+            downloadButton.disabled = commandJSON === null;
+            copyButton.disabled = commandJSON === null;
+        }
+
+        function addMessage(message, type) {
+            const item = document.createElement("li");
+            item.textContent = message;
+            item.className = type;
+            messages.appendChild(item);
+        }
+
+        // Update the preview whenever a field changes.
+        document.querySelectorAll("#name, #trigger, #description, #usage, #args, #script").forEach(input => {
+            input.addEventListener("input", () => {
+                if (input === argsInput) updateArguments();
+                checkCommand();
+            });
+        });
+
+        downloadButton.addEventListener("click", function () {
+            if (!commandJSON) return;
+
+            const file = new Blob([JSON.stringify(commandJSON, null, 4)], {
+                type: "application/json"
+            });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(file);
+
+            link.href = url;
+            link.download = commandJSON.triggercommand + ".json";
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+
+        copyButton.addEventListener("click", function () {
+            if (!commandJSON) return;
+
+            navigator.clipboard.writeText(JSON.stringify(commandJSON, null, 4)).then(() => {
+                status.textContent = "JSON copied!";
+            }).catch(() => {
+                status.textContent = "Couldn't copy automatically. Select the JSON and copy it instead.";
+            });
+        });
+
+        document.getElementById("example").addEventListener("click", function () {
+            nameInput.value = "Greeting";
+            triggerInput.value = "greet";
+            descriptionInput.value = "Greets someone by name.";
+            usageInput.value = "greet <person>";
+            argsInput.value = 1;
+            scriptInput.value = "print(f'Hello, {person}!')";
+
+            updateArguments();
+            argumentFields.querySelector("input").value = "person";
+            checkCommand();
+        });
+
+        document.getElementById("clear").addEventListener("click", function () {
+            nameInput.value = "";
+            triggerInput.value = "";
+            descriptionInput.value = "";
+            usageInput.value = "";
+            argsInput.value = 0;
+            scriptInput.value = "";
+            updateArguments();
+            checkCommand();
+        });
+
+        updateArguments();
+        checkCommand();
+    </script>
+</body>
+</html>
